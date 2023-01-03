@@ -1,9 +1,9 @@
-import 'dart:io';
-import 'dart:math';
+// ignore_for_file: prefer_const_constructors
 
-import 'package:cr_file_saver/file_saver.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:share/share.dart';
 import 'package:video_player/video_player.dart';
 
 import 'video_controller.dart';
@@ -62,27 +62,21 @@ class _PlayStatusState extends State<PlayStatus> {
                       padding: const EdgeInsets.all(15.0),
                       child: Column(
                         children: <Widget>[
-                          const Text(
+                          Text(
                             'Great, Saved in Gallary',
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.all(10.0),
-                          ),
+                          Padding(padding: EdgeInsets.all(10.0)),
                           Text(str,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16.0,
                               )),
-                          const Padding(
-                            padding: EdgeInsets.all(10.0),
-                          ),
-                          const Text('FileManager > wa_status_saver',
+                          Padding(padding: EdgeInsets.all(10.0)),
+                          Text('FileManager > wa_status_saver',
                               style: TextStyle(
                                   fontSize: 16.0, color: Colors.teal)),
-                          const Padding(
-                            padding: EdgeInsets.all(10.0),
-                          ),
+                          Padding(padding: EdgeInsets.all(10.0)),
                           MaterialButton(
                             child: const Text('Close'),
                             color: Colors.teal,
@@ -121,37 +115,104 @@ class _PlayStatusState extends State<PlayStatus> {
             VideoPlayerController.file(File(widget.videoFile)),
         videoSrc: widget.videoFile,
       ),
-      // ),
-      floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.teal,
-          child: const Icon(Icons.save),
-          onPressed: () async {
-            _onLoading(true, '');
-            final originalVideoFile = File(widget.videoFile);
-            if (!Directory('/storage/emulated/0/wa_status_saver')
-                .existsSync()) {
-              Directory('/storage/emulated/0/wa_status_saver')
-                  .createSync(recursive: true);
-            }
+      bottomNavigationBar: Container(
+        margin: EdgeInsets.only(top: 30, left: 25, bottom: 25, right: 25),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              onTap: () async {
+                _onLoading(true, '');
+                final originalVideoFile = File(widget.videoFile);
+                if (!Directory('/storage/emulated/0/wa_status_saver')
+                    .existsSync()) {
+                  Directory('/storage/emulated/0/wa_status_saver')
+                      .createSync(recursive: true);
+                }
 
-            final newFileName = '/storage/emulated/0/wa_status_saver/${widget.videoFile.split("/").last}';
+                final newFileName =
+                    '/storage/emulated/0/wa_status_saver/${widget.videoFile.split("/").last}';
 
-            await originalVideoFile.copy(newFileName);
+                await originalVideoFile.copy(newFileName);
 
-
-            _onLoading(false, 'If Video not available in gallary\n\nYou can find all videos at');
-          }),
+                _onLoading(false,
+                    'If Video not available in gallary\n\nYou can find all videos at');
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF727272),
+                          Color(0xFF171717),
+                        ])),
+                child: Center(
+                  child: Icon(
+                    color: Color(0xFFFFFFFF),
+                    Icons.save,
+                    size: 25,
+                  ),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () async {
+                final myUri = Uri.parse(widget.videoFile);
+                Share.shareFiles(['$myUri']);
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF727272),
+                          Color(0xFF171717),
+                        ])),
+                child: Center(
+                    child: Icon(
+                  Icons.share,
+                  size: 25,
+                  color: Colors.white,
+                )),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                final myUri = Uri.parse(widget.videoFile);
+                Share.shareFiles(['$myUri']);
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF727272),
+                          Color(0xFF171717),
+                        ])),
+                child: Center(
+                    child: Icon(
+                  Icons.repeat,
+                  size: 25,
+                  color: Colors.white,
+                )),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
-  }
-  void _createTempPressed() async {
-    final folder = await getTemporaryDirectory();
-    final filePath = '${folder.parent.parent.path}/whatsapp_status_saver';
-    final file = File(filePath);
-    final raf = await file.open(mode: FileMode.read);
-    await raf.writeString('string\n');
-    await raf.close();
-
-    print('Created temp file: ${file.path}');
-    setState(() {});
   }
 }

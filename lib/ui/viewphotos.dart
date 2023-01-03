@@ -1,9 +1,12 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:speed_dial_fab/speed_dial_fab.dart';
+import 'package:share/share.dart';
 
 class ViewPhotos extends StatefulWidget {
   final String imgPath;
@@ -18,7 +21,6 @@ class ViewPhotos extends StatefulWidget {
 }
 
 class _ViewPhotosState extends State<ViewPhotos> {
-  var filePath;
   final String imgShare = 'Image.file(File(widget.imgPath),)';
 
   final LinearGradient backgroundGradient = const LinearGradient(
@@ -31,11 +33,8 @@ class _ViewPhotosState extends State<ViewPhotos> {
   );
 
   final _fabMiniMenuItemList = [
-    Icons.sd_card,
     Icons.share,
     Icons.reply,
-    Icons.wallpaper,
-    Icons.delete_outline,
   ];
 
   void _onLoading(bool t, String str) {
@@ -115,7 +114,7 @@ class _ViewPhotosState extends State<ViewPhotos> {
       backgroundColor: Colors.black12,
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         leading: IconButton(
           color: Colors.indigo,
           icon: const Icon(
@@ -125,48 +124,195 @@ class _ViewPhotosState extends State<ViewPhotos> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
+      bottomNavigationBar: Container(
+        margin: EdgeInsets.only(top: 30, left: 25, bottom: 25, right: 25),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              onTap: () async {
+                _onLoading(true, '');
+                final myUri = Uri.parse(widget.imgPath);
+                final originalImageFile = File.fromUri(myUri);
+                late Uint8List bytes;
+                await originalImageFile.readAsBytes().then((value) {
+                  bytes = Uint8List.fromList(value);
+                }).catchError((onError) {});
+                await ImageGallerySaver.saveImage(Uint8List.fromList(bytes));
+                _onLoading(false,
+                    'If Image not available in gallary\n\nYou can find all images at');
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF727272),
+                          Color(0xFF171717),
+                        ])),
+                child: Center(
+                  child: Icon(
+                    color: Color(0xFFFFFFFF),
+                    Icons.save,
+                    size: 25,
+                  ),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () async {
+                final myUri = Uri.parse(widget.imgPath);
+                Share.shareFiles(['$myUri']);
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF727272),
+                          Color(0xFF171717),
+                        ])),
+                child: Center(
+                    child: Icon(
+                  Icons.share,
+                  size: 25,
+                  color: Colors.white,
+                )),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                final myUri = Uri.parse(widget.imgPath);
+                Share.shareFiles(['$myUri']);
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF727272),
+                          Color(0xFF171717),
+                        ])),
+                child: Center(
+                    child: Icon(
+                  Icons.repeat,
+                  size: 25,
+                  color: Colors.white,
+                )),
+              ),
+            ),
+            // Container(
+            //   height: 50,
+            //   width: 50,
+            //   decoration: BoxDecoration(
+            //       borderRadius: BorderRadius.circular(30),
+            //       gradient: LinearGradient(
+            //           begin: Alignment.topCenter,
+            //           end: Alignment.bottomCenter,
+            //           colors: [
+            //             Color(0xFF727272),
+            //             Color(0xFF171717),
+            //           ])),
+            //   child: Center(
+            //     child: PopupMenuButton<String>(
+            //       color: Colors.transparent,
+            //       enabled: true,
+            //       icon: Icon(Icons.more_vert_outlined, color: Colors.white),
+            //       onSelected: popupButtonAction,
+            //       itemBuilder: (BuildContext context) {
+            //         return buttonConstants.choices.map((String choice) {
+            //           return PopupMenuItem<String>(
+            //             enabled: true,
+            //             value: choice,
+            //             child: Column(children: [
+            //               Container(
+            //                 height: 50,
+            //                 width: 50,
+            //                 decoration: BoxDecoration(
+            //                     borderRadius: BorderRadius.circular(30),
+            //                     gradient: LinearGradient(
+            //                         begin: Alignment.topCenter,
+            //                         end: Alignment.bottomCenter,
+            //                         colors: [
+            //                           Color(0xFF727272),
+            //                           Color(0xFF171717),
+            //                         ])),
+            //                 child: Column(
+            //                   children: [
+            //                     List.generate(icons.length, (index) {
+            //                       return Icon(index);
+            //                     }).toList()
+            //                   ],
+            //                 ),
+            //               ),
+            //               Text("${choice}",
+            //                   style: TextStyle(color: Colors.white)),
+            //               SizedBox(height: 20)
+            //             ]),
+            //           );
+            //         }).toList();
+            //       },
+            //     ),
+            //   ),
+            // ),
+
+            // SpeedDialFabWidget(
+            // secondaryIconsList: _fabMiniMenuItemList,
+            // secondaryIconsText: [
+            //   "Share",
+            //   "Repost",
+            // ],
+            // secondaryIconsOnPress: [
+            //       () => {},
+            //       () => {},
+            // ],
+            // primaryIconExpand: Icons.add,
+            // primaryIconCollapse: Icons.add,
+            // secondaryBackgroundColor: Colors.teal,
+            // secondaryForegroundColor: Colors.white,
+            // primaryBackgroundColor: Colors.teal,
+            // primaryForegroundColor: Colors.white,
+            // )
+          ],
+        ),
+      ),
       body: Center(
         child: Image.file(
           File(widget.imgPath),
-          fit: BoxFit.cover,
+          fit: BoxFit.fill,
         ),
       ),
-      floatingActionButton: SpeedDialFabWidget(
-        secondaryIconsList: _fabMiniMenuItemList,
-        secondaryIconsText: [
-          "Save",
-          "Share",
-          "Repost",
-          "Set As",
-          "Delete",
-        ],
-        secondaryIconsOnPress: [
-          () async {
-            _onLoading(true, '');
-
-            final myUri = Uri.parse(widget.imgPath);
-            final originalImageFile = File.fromUri(myUri);
-            late Uint8List bytes;
-            await originalImageFile.readAsBytes().then((value) {
-              bytes = Uint8List.fromList(value);
-            }).catchError((onError) {});
-            await ImageGallerySaver.saveImage(Uint8List.fromList(bytes));
-            _onLoading(false,
-                'If Image not available in gallary\n\nYou can find all images at');
-          },
-          () => {},
-          () => {},
-          () => {},
-          () => {},
-        ],
-        primaryIconExpand: Icons.add,
-        primaryIconCollapse: Icons.add,
-        secondaryBackgroundColor: Colors.teal,
-        secondaryForegroundColor: Colors.white,
-        primaryBackgroundColor: Colors.teal,
-        primaryForegroundColor: Colors.white,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
+
+  var icons = [Icons.share, Icons.repeat];
+}
+
+void popupButtonAction(String choice) {
+  if (choice == buttonConstants.Share) {}
+  if (choice == buttonConstants.Repost) {}
+  {}
+}
+
+class buttonConstants {
+  static const String Share = 'Share';
+  static const String Repost = 'Repost';
+
+  static const List<String> choices = <String>[
+    Share,
+    Repost,
+  ];
 }

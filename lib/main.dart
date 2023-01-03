@@ -129,13 +129,13 @@ class MyAppState extends State<MyApp> {
     return AdaptiveTheme(
       light: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.teal,
-         accentColor: Colors.amber,
+        appBarTheme: AppBarTheme(foregroundColor: Colors.black),
+        accentColor: Color(0xFFFF0A6C),
       ),
       dark: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.teal,
-         accentColor: Colors.amber,
+        appBarTheme: AppBarTheme(foregroundColor: Colors.white),
+        accentColor: Color(0xFFFF0A6C),
       ),
       initial: AdaptiveThemeMode.light,
       builder: (theme, darkTheme) => MaterialApp(
@@ -144,7 +144,7 @@ class MyAppState extends State<MyApp> {
         theme: theme,
         darkTheme: darkTheme,
         home: DefaultTabController(
-          length: 2,
+          length: 3,
           child: FutureBuilder(
             future: _storagePermissionChecker,
             builder: (context, status) {

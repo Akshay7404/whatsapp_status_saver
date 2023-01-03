@@ -53,10 +53,19 @@ dependencies:
   video_thumbnail: ^0.5.3
   cr_file_saver: ^0.0.2+1
   fluttertoast: ^8.1.2
+  get: ^4.6.5
+  dio: ^4.0.6
+  get_storage: ^2.0.3
+  webview_cookie_manager: ^2.0.6
+  better_player: ^0.0.83
+  gradient_borders: ^0.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+dependency_overrides:
+  xml: ^6.1.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

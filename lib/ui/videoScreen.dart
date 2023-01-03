@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ final Directory _videoDir = Directory(
 
 class VideoScreen extends StatefulWidget {
   const VideoScreen({Key? key}) : super(key: key);
+
   @override
   VideoScreenState createState() => VideoScreenState();
 }
@@ -73,10 +76,10 @@ class _VideoGridState extends State<VideoGrid> {
           child: GridView.builder(
             itemCount: videoList.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 1,
-              childAspectRatio: 1.0,
-              mainAxisSpacing: 8.0,
-            ),
+                crossAxisCount: 2,
+                childAspectRatio: 1.0,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0),
             itemBuilder: (context, index) {
               return InkWell(
                 onTap: () => Navigator.push(
@@ -90,9 +93,8 @@ class _VideoGridState extends State<VideoGrid> {
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(12)),
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        // Where the linear gradient begins and ends
                         begin: Alignment.bottomLeft,
                         end: Alignment.topRight,
                         stops: [0.1, 0.3, 0.5, 0.7, 0.9],

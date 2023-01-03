@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
+import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class StatusVideo extends StatefulWidget {
@@ -43,10 +43,11 @@ class _StatusVideoState extends State<StatusVideo> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 0),
-      child: Hero(
-        tag: widget.videoSrc,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Container(
+        height: double.maxFinite,
+        padding: const EdgeInsets.only(top: 0),
         child: Chewie(
           controller: _chewieController,
         ),
