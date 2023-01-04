@@ -59,6 +59,8 @@ dependencies:
   webview_cookie_manager: ^2.0.6
   better_player: ^0.0.83
   gradient_borders: ^0.2.0
+  youtube_explode_dart: ^1.12.3
+  flutter_local_notifications: ^12.0.4
 
 dev_dependencies:
   flutter_test:

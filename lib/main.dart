@@ -3,9 +3,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-import 'ui/homepage.dart';
-// import 'package:flutter_html/flutter_html.dart';
+import 'package:whats_app_saver/whatsapp/ui/homepage.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -144,7 +142,7 @@ class MyAppState extends State<MyApp> {
         theme: theme,
         darkTheme: darkTheme,
         home: DefaultTabController(
-          length: 3,
+          length: 2,
           child: FutureBuilder(
             future: _storagePermissionChecker,
             builder: (context, status) {
