@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "896111971029",
+    "project_id": "status-saver-fede0",
+    "storage_bucket": "status-saver-fede0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896111971029:android:7f78c3ce61f2b1a483f05c",
+        "android_client_info": {
+          "package_name": "com.example.whats_app_saver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "896111971029-juujctpbo69cvjatci1sl5kh8bkkobbq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9HNF9Zld4JfXtTjoKoF_DQSbpyosyKVs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "896111971029-juujctpbo69cvjatci1sl5kh8bkkobbq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

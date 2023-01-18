@@ -61,6 +61,16 @@ dependencies:
   gradient_borders: ^0.2.0
   youtube_explode_dart: ^1.12.3
   flutter_local_notifications: ^12.0.4
+  device_apps: ^2.2.0
+  connectivity_plus: ^3.0.2
+  loading_animation_widget: ^1.2.0+4
+  firebase_core: ^2.4.1
+  firebase_database: ^10.0.9
+  cloud_firestore: ^4.1.0
+  share_whatsapp: ^1.0.2
+  appinio_video_player: ^1.2.0
+  pull_to_refresh: ^2.0.0
+  open_filex: ^4.3.2
 
 dev_dependencies:
   flutter_test:

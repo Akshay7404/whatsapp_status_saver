@@ -8,12 +8,14 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 class DownloaderHelper {
   YoutubeExplode youtubeExplode = YoutubeExplode();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
+  static String videoName = "";
+  static String audioName = "";
 
   Future<Map<String, dynamic>> getVideoInfo(Uri url) async {
     Video video = await youtubeExplode.videos.get(url.toString());
     var manifest =
-        await youtubeExplode.videos.streamsClient.getManifest(video.id);
+    await youtubeExplode.videos.streamsClient.getManifest(video.id);
     ThumbnailSet image = video.thumbnails;
 
     return {
@@ -35,31 +37,44 @@ class DownloaderHelper {
     };
   }
 
-  Future<bool> _requestPermission(Permission permission) async {
-    if (await permission.isGranted) {
-      return true;
-    } else {
-      var result = await permission.request();
-      if (result == PermissionStatus.granted) {
-        return true;
+  Future<bool> _requestPermission(List<Permission> permission) async {
+     permission.forEach(( value) async {
+      if (await value.isGranted) {
+        print("download helper ${value.status.isGranted.toString()}");
+        return Future(() => true);
+      } else {
+        var result = await value.request();
+        if (result == PermissionStatus.granted) {
+          return Future(() => true);
+        }
       }
-    }
+      return Future(() => false);
+
+    });
+
+
+   // openAppSettings();
+    print("download helper last ${permission.length}");
     return false;
   }
 
   downloadMp3(VideoId videoId, String name) async {
     try {
       if (Platform.isAndroid) {
-        if (await _requestPermission(Permission.storage)) {
+        if (await _requestPermission(
+            [Permission.notification,Permission.storage])) {
           print("Permission Granted !\n");
           var manifest =
-              await youtubeExplode.videos.streamsClient.getManifest(videoId);
+          await youtubeExplode.videos.streamsClient.getManifest(videoId);
 
           var streamInfo = manifest.audioOnly;
           int count = 0;
           if (streamInfo != null) {
             var totalSize =
-                manifest.audioOnly.withHighestBitrate().size.totalBytes;
+                manifest.audioOnly
+                    .withHighestBitrate()
+                    .size
+                    .totalBytes;
 
             var stream = youtubeExplode.videos.streamsClient
                 .get(streamInfo.withHighestBitrate());
@@ -67,15 +82,46 @@ class DownloaderHelper {
             String directory = await createAudioDirectory();
             //Directory('/storage/emulated/0/Download');
             var file = File(
-                "$directory/${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}${DateTime.now().millisecond}'.mp3");
+                "$directory/${DateTime
+                    .now()
+                    .year}${DateTime
+                    .now()
+                    .month}${DateTime
+                    .now()
+                    .day}${DateTime
+                    .now()
+                    .hour}${DateTime
+                    .now()
+                    .minute}${DateTime
+                    .now()
+                    .second}${DateTime
+                    .now()
+                    .millisecond}.mp3");
+            audioName =
+            ("${DateTime
+                .now()
+                .year}${DateTime
+                .now()
+                .month}${DateTime
+                .now()
+                .day}${DateTime
+                .now()
+                .hour}${DateTime
+                .now()
+                .minute}${DateTime
+                .now()
+                .second}${DateTime
+                .now()
+                .millisecond}.mp3");
 
             var fileStream = file.openWrite(mode: FileMode.writeOnlyAppend);
 
             // Pipe all the content of the stream into the file.
             // await stream.pipe(fileStream);
+            print("total file size $totalSize");
             await for (final data in stream) {
               count += data.length;
-
+              print("count $count");
               var progress = ((count / totalSize) * 100).ceil();
               print("$progress%");
               fileStream.add(data);
@@ -109,33 +155,71 @@ class DownloaderHelper {
   downloadMp4(VideoId videoId, String name) async {
     try {
       if (Platform.isAndroid) {
-        if (await _requestPermission(Permission.storage)) {
+        print("Permission Granted ${Platform.operatingSystem}");
+        if (await _requestPermission(
+            [Permission.notification,Permission.storage])) {
           print("Permission Granted !\n");
           var manifest =
-              await youtubeExplode.videos.streamsClient.getManifest(videoId);
+          await youtubeExplode.videos.streamsClient.getManifest(videoId);
           print(
-              "video qulity=======${manifest.muxed.withHighestBitrate().videoQuality}");
+              "video qulity=======${manifest.muxed
+                  .withHighestBitrate()
+                  .videoQuality}");
           var streamInfo = manifest.muxed.withHighestBitrate();
-
+          int count = 0;
           if (streamInfo != null) {
+            //var totalSize = manifest.videoOnly.withHighestBitrate().size.totalMegaBytes;
+            var totalVideoSize =
+                manifest.muxed
+                    .withHighestBitrate()
+                    .size
+                    .totalBytes;
             var stream = youtubeExplode.videos.streamsClient.get(streamInfo);
-
             var directory = await createVideoDirectory();
             // String savePath = appDocDir.path + "/${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}${DateTime.now().millisecond}'.mp4";
 
             var file = File(
-                "$directory/${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}${DateTime.now().millisecond}'.mp4");
+                "$directory/${DateTime
+                    .now()
+                    .year}${DateTime
+                    .now()
+                    .month}${DateTime
+                    .now()
+                    .day}${DateTime
+                    .now()
+                    .hour}${DateTime
+                    .now()
+                    .minute}${DateTime
+                    .now()
+                    .second}${DateTime
+                    .now()
+                    .millisecond}.mp4");
+            videoName =
+            "${DateTime
+                .now()
+                .year}${DateTime
+                .now()
+                .month}${DateTime
+                .now()
+                .day}${DateTime
+                .now()
+                .hour}${DateTime
+                .now()
+                .minute}${DateTime
+                .now()
+                .second}${DateTime
+                .now()
+                .millisecond}.mp4";
             var fileStream = file.openWrite(mode: FileMode.writeOnlyAppend);
-            int count = 0;
-            var totalSize =
-                manifest.videoOnly.withHighestBitrate().size.totalBytes;
             // Pipe all the content of the stream into the file.
-            //await stream.pipe(fileStream);
-            await for (final data in stream) {
-              count += data.length;
 
-              var progress = ((count / totalSize) * 100).ceil();
+            print("total size of video file $totalVideoSize");
+            await for (final data in stream) {
+              count = count + data.length;
+              print("video file count $count");
+              var progress = ((count / totalVideoSize) * 100).ceil();
               print("$progress%");
+              fileStream.add(data);
               //Show Notification
               LocalNotificationService.showProgressNotification(
                 progrss: progress,
@@ -143,11 +227,9 @@ class DownloaderHelper {
                 title: "Downloading...",
                 body: name,
               );
-              fileStream.add(data);
             }
             Future.delayed(const Duration(milliseconds: 1500));
             await LocalNotificationService.cancelAllNotifications();
-
             // Close the file.
             await fileStream.flush();
             await fileStream.close();
@@ -169,7 +251,7 @@ class DownloaderHelper {
     if (await status.isDenied) {
       Permission.manageExternalStorage.request();
     }
-    String name = "ytdownloader";
+    String name = "InstaReelsDownloader";
     final path = Directory("storage/emulated/0/$name");
     if (await path.exists()) {
       print(path.path);

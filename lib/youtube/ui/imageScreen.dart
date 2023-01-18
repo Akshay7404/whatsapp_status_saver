@@ -2,10 +2,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:whats_app_saver/youtube/ui/viewphotos.dart';
 
-import 'viewphotos.dart';
-
-final Directory _newPhotoDir = Directory(
+final Directory newPhotoDir = Directory(
     '/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses');
 
 class ImageScreen extends StatefulWidget {
@@ -15,37 +16,54 @@ class ImageScreen extends StatefulWidget {
   ImageScreenState createState() => ImageScreenState();
 }
 
-class ImageScreenState extends State<ImageScreen> {
+class ImageScreenState extends State<ImageScreen> with WidgetsBindingObserver {
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
-  List<String> imageList = [];
-
   @override
-  Widget build(BuildContext context) {
-    if (!Directory('${_newPhotoDir.path}').existsSync()) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Install WhatsApp\n',
-            style: TextStyle(fontSize: 18.0),
-          ),
-          const Text(
-            "Your Friend's Status Will Be Available Here",
-            style: TextStyle(fontSize: 18.0),
-          ),
-        ],
-      );
-    } else {
-      imageList = _newPhotoDir
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print("image screen app life cycle $state");
+    if (state == AppLifecycleState.resumed ||
+        state == AppLifecycleState.paused) {
+      imageList = newPhotoDir
           .listSync()
           .map((item) => item.path)
           .where((item) => item.endsWith('.jpg'))
           .toList();
-      if (imageList.length > 0) {
+      //print("image list set $imageList");
+
+    }
+    setState(() {});
+  }
+
+  RefreshController controller = RefreshController();
+  List<String> imageList = [];
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Directory(newPhotoDir.path).existsSync()) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Install WhatsApp', style: TextStyle(fontSize: 18.0)),
+          SizedBox(height: 10),
+          Text("Your Friend's Status Will Be Available Here",
+              style: TextStyle(fontSize: 18.0)),
+        ],
+      );
+    } else {
+      setState(() {
+        imageList = newPhotoDir
+            .listSync()
+            .map((item) => item.path)
+            .where((item) => item.endsWith('.jpg'))
+            .toList();
+      });
+      if (imageList.isNotEmpty) {
         return Container(
             margin: const EdgeInsets.all(8.0),
             child: GridView.builder(
@@ -62,16 +80,7 @@ class ImageScreenState extends State<ImageScreen> {
                     padding: const EdgeInsets.all(1.0),
                     child: InkWell(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ViewPhotos(
-                                  imgPath: imgPath,
-
-                                ),
-                          ),
-                        );
+                        Get.to(ViewPhotos(imgPath: imgPath));
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -91,13 +100,17 @@ class ImageScreenState extends State<ImageScreen> {
             ));
       } else {
         return Scaffold(
-          body: Center(
-            child: Container(
-                padding: const EdgeInsets.only(bottom: 60.0),
-                child: const Text(
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: Text(
                   'Sorry, No Image Found!',
                   style: TextStyle(fontSize: 18.0),
-                )),
+                ),
+              ),
+            ],
           ),
         );
       }

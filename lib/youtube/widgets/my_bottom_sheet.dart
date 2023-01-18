@@ -47,26 +47,22 @@ class MyBottomSheet extends StatelessWidget {
                     const Placeholder(),
               ),
             ),
-            Text(
-              title,
-            ),
-            Text(
-              author,
-            ),
-            Text(
-              duration,
-            ),
+            Text(title),
+            Text(author),
+            Text(duration.split(".").first),
             const SizedBox(height: 10),
             MaterialButton(
                 onPressed: mp3Method,
                 color: Colors.green,
                 textColor: Colors.white,
-                child: Text('Download MP3 ($mp3Size MB)')),
+                child: Text(
+                    'Download MP3 (${double.parse(mp3Size).toStringAsFixed(1)} MB)')),
             MaterialButton(
                 onPressed: mp4Method,
                 color: Colors.purple,
                 textColor: Colors.white,
-                child: Text('Download MP4 ($mp4Size MB)')),
+                child: Text(
+                    'Download MP4 (${double.parse(mp4Size).toStringAsFixed(1)} MB)')),
           ],
         ),
       ),

@@ -1,17 +1,47 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:whats_app_saver/youtube/models/download_helper.dart';
 
 class LocalNotificationService {
   static final flutterNotificationService = FlutterLocalNotificationsPlugin();
 
   //Initialze
-  static Future<void> intialize() async {
+  static void intialize() async {
     const AndroidInitializationSettings androidInitializationSettings =
         AndroidInitializationSettings("mipmap/ic_launcher");
 
     const InitializationSettings initializationSettings =
         InitializationSettings(android: androidInitializationSettings);
 
-    await flutterNotificationService.initialize(initializationSettings);
+    await flutterNotificationService.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (details) async {
+        final String? payload = details.payload;
+        if (details.payload != null) {
+          debugPrint('notification payload: ${payload.toString()}');
+        }
+        String videoFileName = DownloaderHelper.videoName;
+        String audioFileName = DownloaderHelper.audioName;
+        if (videoFileName.endsWith('mp4')) {
+          OpenFilex.open(
+                  "storage/emulated/0/InstaReelsDownloader/Video/$videoFileName")
+              .then((value) {
+            videoFileName = "";
+          });
+        }
+        if (audioFileName.endsWith('mp3')) {
+          print("audio file name $audioFileName");
+          print("audio file name ${audioFileName.endsWith('mp3')}");
+
+          OpenFilex.open(
+                  "storage/emulated/0/InstaReelsDownloader/Audio/$audioFileName")
+              .then((value) {
+            audioFileName = "";
+          });
+        }
+      },
+    );
   }
 
   //Notification Details

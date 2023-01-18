@@ -1,49 +1,28 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
 
-import 'package:appinio_video_player/appinio_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:share/share.dart';
 import 'package:share_whatsapp/share_whatsapp.dart';
-import 'package:video_player/video_player.dart';
 
-class PlayStatus extends StatefulWidget {
-  final String videoFile;
+class ViewPhotos extends StatefulWidget {
+  final String imgPath;
 
-  const PlayStatus({
+  const ViewPhotos({
     Key? key,
-    required this.videoFile,
+    required this.imgPath,
   }) : super(key: key);
 
   @override
-  _PlayStatusState createState() => _PlayStatusState();
+  _ViewPhotosState createState() => _ViewPhotosState();
 }
 
-class _PlayStatusState extends State<PlayStatus> {
-  @override
-  void initState() {
-    videoPlayerController = VideoPlayerController.file(File(widget.videoFile))
-      ..initialize().then((value) => setState(() {}));
-    _customVideoPlayerController = CustomVideoPlayerController(
-        context: context,
-        videoPlayerController: videoPlayerController,
-
-        customVideoPlayerSettings: CustomVideoPlayerSettings(
-            controlBarAvailable: true,
-            exitFullscreenOnEnd: true,
-            showDurationPlayed: true,
-            customVideoPlayerProgressBarSettings:
-            CustomVideoPlayerProgressBarSettings(
-                allowScrubbing: true, showProgressBar: true)));
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _customVideoPlayerController.dispose();
-    super.dispose();
-  }
+class _ViewPhotosState extends State<ViewPhotos> {
+  final String imgShare = 'Image.file(File(widget.imgPath),)';
 
   void _onLoading(bool t, String str) {
     if (t) {
@@ -76,23 +55,29 @@ class _PlayStatusState extends State<PlayStatus> {
                       padding: const EdgeInsets.all(15.0),
                       child: Column(
                         children: <Widget>[
-                          Text(
-                            'Great, Saved in Gallery',
+                          const Text(
+                            'Great, Saved in Gallary',
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
-                          Padding(padding: EdgeInsets.all(10.0)),
+                          const Padding(
+                            padding: EdgeInsets.all(10.0),
+                          ),
                           Text(str,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16.0,
                               )),
-                          Padding(padding: EdgeInsets.all(10.0)),
-                          Text('FileManager > wa_status_saver',
+                          const Padding(
+                            padding: EdgeInsets.all(10.0),
+                          ),
+                          const Text('FileManager > wa_status_saver',
                               style: TextStyle(
                                   fontSize: 16.0, color: Colors.teal)),
-                          Padding(padding: EdgeInsets.all(10.0)),
+                          const Padding(
+                            padding: EdgeInsets.all(10.0),
+                          ),
                           MaterialButton(
-                            child: Text('Close'),
+                            child: const Text('Close'),
                             color: Colors.teal,
                             textColor: Colors.white,
                             onPressed: () => Navigator.pop(context),
@@ -108,29 +93,23 @@ class _PlayStatusState extends State<PlayStatus> {
     }
   }
 
-  late VideoPlayerController videoPlayerController;
-  late CustomVideoPlayerController _customVideoPlayerController;
-
   @override
   Widget build(BuildContext context) {
+    //The list of FabMiniMenuItems that we are going to use
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         leading: IconButton(
-          color: Colors.white,
+          color: Colors.indigo,
           icon: const Icon(
             Icons.close,
             color: Colors.white,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 15),
-        child: CustomVideoPlayer(
-            customVideoPlayerController: _customVideoPlayerController),
       ),
       bottomNavigationBar: Container(
         margin: EdgeInsets.only(top: 30, left: 25, bottom: 25, right: 25),
@@ -152,25 +131,22 @@ class _PlayStatusState extends State<PlayStatus> {
                       ])),
               child: Center(
                 child: IconButton(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   onPressed: () async {
                     _onLoading(true, '');
-                    final originalVideoFile = File(widget.videoFile);
-                    if (!Directory('/storage/emulated/0/wa_status_saver')
-                        .existsSync()) {
-                      Directory('/storage/emulated/0/wa_status_saver')
-                          .createSync(recursive: true);
-                    }
-                    final newFileName =
-                        '/storage/emulated/0/wa_status_saver/${widget.videoFile
-                        .split("/")
-                        .last}';
-                    await originalVideoFile.copy(newFileName);
-
+                    final myUri = Uri.parse(widget.imgPath);
+                    final originalImageFile = File.fromUri(myUri);
+                    late Uint8List bytes;
+                    await originalImageFile.readAsBytes().then((value) {
+                      bytes = Uint8List.fromList(value);
+                    }).catchError((onError) {});
+                    await ImageGallerySaver.saveImage(
+                        Uint8List.fromList(bytes));
                     _onLoading(false,
-                        'If Video not available in gallary\n\nYou can find all videos at');
+                        'If Image not available in gallary\n\nYou can find all images at');
                   },
-                  icon: Icon(Icons.save, size: 25),
                   color: Color(0xFFFFFFFF),
+                  icon: Icon(Icons.save, size: 25),
                 ),
               ),
             ),
@@ -188,14 +164,14 @@ class _PlayStatusState extends State<PlayStatus> {
                       ])),
               child: Center(
                   child: IconButton(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    onPressed: () {
-                      final myUri = Uri.parse(widget.videoFile);
-                      Share.shareFiles(['$myUri']);
-                    },
-                    icon: Icon(Icons.share, size: 25),
-                    color: Colors.white,
-                  )),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                onPressed: () {
+                  final myUri = Uri.parse(widget.imgPath);
+                  Share.shareFiles(['$myUri']);
+                },
+                icon: Icon(Icons.share, size: 25),
+                color: Colors.white,
+              )),
             ),
             Container(
               height: 50,
@@ -211,16 +187,22 @@ class _PlayStatusState extends State<PlayStatus> {
                       ])),
               child: Center(
                   child: IconButton(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    onPressed: () {
-                      var file = XFile(widget.videoFile);
-                      shareWhatsapp.shareFile(file);
-                    },
-                    icon: Icon(Icons.repeat, size: 25),
-                    color: Colors.white,
-                  )),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                onPressed: () async {
+                  var file = XFile(widget.imgPath);
+                  shareWhatsapp.shareFile(file);
+                },
+                icon: Icon(Icons.repeat, size: 25),
+                color: Colors.white,
+              )),
             ),
           ],
+        ),
+      ),
+      body: Center(
+        child: Image.file(
+          File(widget.imgPath),
+          fit: BoxFit.fill,
         ),
       ),
     );
